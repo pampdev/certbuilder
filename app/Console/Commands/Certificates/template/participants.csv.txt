@@ -1,0 +1,2 @@
+Full Name,Email Address,Attended Yes/No
+"Juan Dela Cruz",juan@juan.com,Yes

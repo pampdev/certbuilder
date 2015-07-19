@@ -1,0 +1,24 @@
+[app]
+theme = default
+source = participants.csv
+
+[csv]
+name = 1
+email = 
+
+[file]
+prefix  = "ca_sample_"
+
+[pdf]
+orientation     = Landscape
+page_size       = A4
+margins[top]    = 0.0
+margins[bottom] = 0.0
+margins[left]   = 0.0
+margins[right]  = 0.0
+
+[event]
+title  = "Certificate of Attendance"
+event_name        = "This is the event name"
+event_place       = "Angeles City, Philippines"
+date              = "2015-01-01"

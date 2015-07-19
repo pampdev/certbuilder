@@ -1,0 +1,12 @@
+<?php 
+function sample_validate($data) {
+    if (!$data['email']) {
+        return "No email found";
+    }
+
+    if (!isset($data[10]) || strtolower($data[10]) != 'yes') {
+        return "skip";
+    }
+    
+    return '';
+}
