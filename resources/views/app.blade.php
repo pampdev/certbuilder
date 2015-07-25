@@ -31,7 +31,7 @@
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
 					<li><a href="{{ url('/certificates') }}">Certificates</a></li>
-					<li><a href="{{ url('/sketchboard') }}">Sketch Board</a></li>
+					<li><a href="{{ url('/sandbox') }}">Try it!</a></li>
 				</ul>
 
 				<ul class="nav navbar-nav navbar-right">
@@ -51,10 +51,13 @@
 		</div>
 	</nav>
 
+	@include('partials/session_message')
 	@yield('content')
 
 	<!-- Scripts -->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+	@yield('footer')
 </body>
 </html>

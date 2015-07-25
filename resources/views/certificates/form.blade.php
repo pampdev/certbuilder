@@ -10,29 +10,39 @@
 {!! Form::model($event, ['route' => ['certificates.store']]) !!}
 @endif
 
-@if (count($errors) > 0)
-    <div class="alert alert-danger">
-        <strong>Whoops!</strong> There were some problems with your input.<br><br>
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif        
+@include('partials/form_error')    
+
+<fieldset>
+    <legend>Basic</legend>
+
+    {!! selectfield('cert_type', 'Type', $cert_types, $errors, $event ? $event->cert_type : '') !!}    
+    {!! selectfield('theme', 'Theme', $themes, $errors, $event ? $event->theme : '') !!}
+
+    @if (!$event)
+    {!! textfield('code', 'Unique Code', $errors) !!}
+    <p><small>Used for uniquely identifying this event. Accepts alphanumeric small characters only [a-z0-9])</small></p>
+    @endif
+</fieldset>     
+    
+
+<fieldset>
+    <legend>Event</legend>
+    {!! textfield('event_name', 'Name', $errors, $event ? $event->event_name : '') !!}
+    {!! textfield('event_place', 'Location', $errors, $event ? $event->event_place : '') !!}
+    {!! textfield('event_date', 'Date', $errors, $event ? $event->event_date : '') !!}
+</fieldset>   
+
+<fieldset>
+    <legend>PDF settings</legend>
+    {!! textfield('filename_prefix', 'Prefix (optional)', $errors, $event ? $event->filename_prefix : '') !!}
+    <p><small>Used for filename of the pdf (e.g. ca_prefix_uniquenameofpdf.pdf)</small></p>
+</fieldset>     
+    
         
-        @if (!$event)
-        {!! textfield('code', 'Unique Code', $errors) !!}
-        @endif
         
-        {!! textfield('event_name', 'Event Name', $errors, $event ? $event->event_name : '') !!}
-        {!! textfield('event_place', 'Event Location', $errors, $event ? $event->event_place : '') !!}
-        {!! textfield('event_date', 'Event Date', $errors, $event ? $event->event_date : '') !!}
-        {!! textfield('title', 'Certificate Title', $errors, $event ? $event->typeTitle : '') !!}
-        {!! textfield('filename_prefix', 'Filename Prefix', $errors, $event ? $event->filename_prefix : '') !!}
             
-        {!! selectfield('cert_type', 'Type', $cert_types, $errors, $event ? $event->cert_type : '') !!}    
-        {!! selectfield('theme', 'Theme', $themes, $errors, $event ? $event->theme : '') !!}
+        
+        
 
         <input type="submit" value="Save" class="btn" />
         {!! Form::close() !!}     

@@ -16,7 +16,7 @@
         Filename Prefix: {!! $event->filename_prefix !!}
         <br/>
         <a class="btn btn-primary" href="{!! url('certificates/' . $event->id . '/edit') !!}">edit</a>
-        <a class="btn btn-primary" href="{!! url('sketchboard?setting=' . $event->id) !!}">sketchboard</a>
+        <a class="btn btn-primary" href="{!! url('sandbox?setting=' . $event->id) !!}">preview</a>
 
     </div>
 </div>

@@ -19,7 +19,7 @@ Route::get('certificates/preview', ['as' => 'certificates.preview', 'uses' => 'C
 Route::get('certificates/pdf', ['as' => 'certificates.pdf', 'uses' => 'CertificatesController@pdf']);
 Route::resource('certificates', 'CertificatesController');
 
-Route::get('sketchboard', 'CertificatesController@sketchboard');
+Route::get('sandbox', 'CertificatesController@sandbox');
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',

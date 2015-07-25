@@ -32,13 +32,15 @@ class CertificatesController extends Controller {
     {
 
         $list = $this->event->where('user_id', '=', Auth::user()->id)->get();
-
         return view('certificates.index')->with(compact('list'));
     }
 
     public function show($event_id)
     {
         $event = $this->event->find($event_id);
+        if (!$event) {
+            return redirect('/certificates')->withError('Event not found.');
+        }
 
         return view('certificates.show')->with(compact('event'));
     }
@@ -66,6 +68,10 @@ class CertificatesController extends Controller {
     public function edit($event_id)
     {
         $event = $this->event->find($event_id);
+        if (!$event) {
+            return redirect('/certificates')->withError('Event not found.');
+        }
+
         $themes = $this->themes;
         $cert_types = $this->event->certTypes();
         return view('certificates.form')->with(compact('event', 'themes', 'cert_types'));
@@ -75,6 +81,10 @@ class CertificatesController extends Controller {
     {
         $data = (array)$request->all();
         $event = $this->event->find($id);
+        if (!$event) {
+            return redirect('/certificates')->withError('Event not found.');
+        }
+
         $data['code'] = $event->code;
         $event->update($data);
         if ($event) {
@@ -84,9 +94,20 @@ class CertificatesController extends Controller {
         return redirect('/certificates/create')->withError('Event failed.');
     }
 
-    public function sketchboard()
+    public function destroy($id) {
+        $event = $this->event->find($id);
+        if (!$event) {
+            return redirect('/certificates')->withError('Event not found.');
+        }
+
+        if ($event->delete($id)) {
+            return \Redirect::route('certificates.index')->with('message', 'Recipe deleted.');
+        }
+        return \Redirect::route('certificates.index')->withError('Unable to delete.');
+    }
+
+    public function sandbox()
     {
-        
         $themes = $this->themes;
         $event_id = Input::get('setting');
         
@@ -95,7 +116,7 @@ class CertificatesController extends Controller {
             $event = $this->event->find($event_id);
         }
 
-        return view('certificates.sketchboard')->with(compact('themes', 'event'));
+        return view('certificates.sandbox')->with(compact('themes', 'event'));
     }
 
     public function preview()
