@@ -149,6 +149,8 @@ class CertificatesController extends Controller {
             $theme = $setup['app']['theme'];
         }
 
+        $prefix = 'xx_';
+
         // Can be changed via _GET
         foreach ($variables as $key) {
             if (Input::get($key)) {
@@ -167,15 +169,49 @@ class CertificatesController extends Controller {
             $name_style = 'style="font-size: 4em;"';
         }
 
-        return view('templates.'.$theme.'.index')->with(compact(
+        $renderFile = view('templates.'.$theme.'.index')->with(compact(
             'name', 'name_style', 'title', 'theme',
             'event_name', 'event_place', 'date_day', 'date_month', 'date_year'
         ));
-    }
 
-    protected function setValues() 
-    {
+        if (Input::get('download')) {
+            $path = base_path() . '/CertificateBuilder/pdf_settings.ini';
+            $pdf_settings = parse_ini_file($path, true);
+            $wkoptions_path = base_path() . '/public/tmp/';
 
+            if (!file_exists($wkoptions_path)) {
+                mkdir($wkoptions_path, 0777, true);
+            }
+
+            $this->wkoptions = array(
+                'path' => $wkoptions_path,
+                'binpath'     => \Config::get('pdf.wkhtmltopdf_bin'),
+                'orientation' => $pdf_settings['pdf']['orientation'],
+                'page_size'   => $pdf_settings['pdf']['page_size'],
+                'margins' => [
+                    'top'   => $pdf_settings['pdf']['margins']['top'],
+                    'bottom'=> $pdf_settings['pdf']['margins']['bottom'],
+                    'left'  => $pdf_settings['pdf']['margins']['left'],
+                    'right'  => $pdf_settings['pdf']['margins']['right'],
+                ]
+            );
+
+            $filename = preg_replace('/[^\da-z]/i', '', $name);
+            $filename = $prefix . strtolower($filename) . '.pdf';
+
+            try {
+                $wkhtmltopdf = new Wkhtmltopdf($this->wkoptions);
+                $wkhtmltopdf->setHtml($renderFile);
+                $wkhtmltopdf->output(Wkhtmltopdf::MODE_DOWNLOAD, $filename);
+            } catch (Exception $e) {
+                $this->error($e->getMessage());
+                return false;
+            }
+
+            return '';
+        } else {
+            return $renderFile;
+        }
     }
 
 }

@@ -24,4 +24,7 @@
     </div>
 
     <div id="border-bottom"><span>&nbsp;</span></div>
+    @if (!isset($_GET['download']))
+    <a style="position: absolute; right: 10px; top: 10px;" href="{{ url('certificates/preview?' . $_SERVER['QUERY_STRING']) }}&download=1">Download</a>
+    @endif
 </html>
