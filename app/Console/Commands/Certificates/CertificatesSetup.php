@@ -116,7 +116,7 @@ class CertificatesSetup extends Command {
      */
     protected function getRootPath()
     {
-        return base_path() . '/resources/certificate_settings';
+        return base_path() . '/CertificateBuilder/events';
     }
 
     /**

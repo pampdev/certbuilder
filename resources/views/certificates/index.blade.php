@@ -3,22 +3,25 @@
 @section('content')
 <div class="container">
     <div class="row">
-        {!! Form::open( array(
-            'route' => 'certificates.preview',
-            'method' => 'get',
-            'target' => '_blank'
-        ) ) !!}
-
-        {!! textfield('name', 'Name', $errors, Input::get('name')) !!}
-        {!! textfield('event_name', 'Event Name', $errors, Input::get('event_name')) !!}
-        {!! textfield('event_place', 'Event Location', $errors, Input::get('event_place')) !!}
-        {!! textfield('date', 'Event Date', $errors, Input::get('date')) !!}
-        {!! textfield('title', 'Certificate Title', $errors, Input::get('title')) !!}
-        
-        {!! selectfield('theme', 'Theme', $themes, $errors) !!}
-
-        <input type="submit" value="Preview" class="btn" />
-        {!! Form::close() !!}     
+        <table class="table table-stripe">
+            <tr>
+                <th>#</th>
+                <th>Event Name</th>
+                <th>Certificate Type</th>
+                <th>Action</th>
+            </tr>
+            @foreach ($list as $item)
+            <tr>
+                <td>{!! $item->id !!}</td>
+                <td>{!! $item->event_name !!}</td>
+                <td>{!! $item->typeTitle !!}</td>
+                <td>
+                    <a class="btn btn-primary" href="{!! url('certificates/' . $item->id) !!}">view</a>
+                    <a class="btn btn-primary" href="{!! url('sketchboard?setting=' . $item->id) !!}">sketchboard</a>
+                </td>
+            </tr>
+            @endforeach
+        </table> 
 
     </div>
 </div>

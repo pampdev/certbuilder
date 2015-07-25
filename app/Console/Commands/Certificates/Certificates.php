@@ -5,6 +5,8 @@ use Illuminate\Foundation\Inspiring;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
+use App\Event;
+
 use Wkhtmltopdf;
 
 class Certificates extends Command {
@@ -30,37 +32,41 @@ class Certificates extends Command {
      */
     public function fire()
     {
-        $setting_filename = $this->argument('setting');
-        $this->limit = (int)$this->option('limit');
+        $this->eventModel = new Event();
         
-        $path = base_path() . '/resources/certificate_settings/' . $setting_filename . '/';
-        include_once($path . '/validation.php');
 
-        $setup = parse_ini_file($path . 'setup.ini', true);;
-        $this->setting = $setup;
-        $this->setting['filename'] = $setting_filename;
+        $setting_filename = $this->argument('event_id');
+        $limit = (int)$this->option('limit');
 
+        $this->setting = $this->eventModel->where('code', '', $setting_filename);
+        
+        // Create the destination folder
         $wkoptions_path = base_path() . '/public/download/' . $setting_filename;
         if (!file_exists($wkoptions_path)) {
             mkdir($wkoptions_path, 0777, true);
         }
 
+        // Start the process
+        $path = base_path() . '/CertificateBuilder/pdf_settings.ini';
+        $pdf_settings = parse_ini_file($path . 'setup.ini', true);;
+
         $this->wkoptions = array(
             'path'        => $wkoptions_path . '/',
             'binpath'     => \Config::get('pdf.wkhtmltopdf_bin'),
-            'orientation' => $setup['pdf']['orientation'],
-            'page_size'   => $setup['pdf']['page_size'],
+            'orientation' => $pdf_settings['pdf']['orientation'],
+            'page_size'   => $pdf_settings['pdf']['page_size'],
             'margins' => [
-                'top'   => $setup['pdf']['margins']['top'],
-                'bottom'=> $setup['pdf']['margins']['bottom'],
-                'left'  => $setup['pdf']['margins']['left'],
-                'right'  => $setup['pdf']['margins']['right'],
+                'top'   => $pdf_settings['pdf']['margins']['top'],
+                'bottom'=> $pdf_settings['pdf']['margins']['bottom'],
+                'left'  => $pdf_settings['pdf']['margins']['left'],
+                'right'  => $pdf_settings['pdf']['margins']['right'],
             ]
         );
 
-        $this->theme = $setup['app']['theme'];
-
-        $column = $this->setting['csv'];
+        $column = [
+            'name' => 1,
+            'email' => 2
+        ];
         
         $file = fopen($path . $setup['app']['source'], 'r');
         $ctr = 0;
@@ -69,7 +75,10 @@ class Certificates extends Command {
             $ctr++;
 
             $name = trim($line[$column['name']]);
-            $email = trim($line[$column['email']]);
+            $email = '';
+            if ($column['email']) {
+                $email = trim($line[$column['email']]);    
+            }
 
             $line['name'] = $name;
             $line['email'] = $email;
@@ -92,12 +101,15 @@ class Certificates extends Command {
                 }
             }
 
-
             $this->comment($name . ' - ' . $email);
             $this->createPdf($line);
 
-            if ($this->limit > 0 && $this->limit <= $ctr) {
-                break;
+            // Break if this is a test
+            if ($limit > 0) {
+                if ($limit <= $ctr) {
+                    break;
+                }
+                $limit++;
             }
         }
     }
@@ -105,11 +117,11 @@ class Certificates extends Command {
     public function createPdf($data)
     {
         $filename = preg_replace('/[^\da-z]/i', '', $data['name']);
-        $filename = $this->setting['file']['prefix'] . strtolower($filename) . '.pdf';
+        $filename = $this->setting->filename_prefix . strtolower($filename) . '.pdf';
 
         $renderFile = url('/certificates/preview');
         $renderFile .= '?name=' . urlencode($data['name']);
-        $renderFile .= '&setting=' . urlencode($this->setting['filename']);
+        $renderFile .= '&setting=' . urlencode($this->setting->code);
         
         $this->info($filename);
 
@@ -133,7 +145,7 @@ class Certificates extends Command {
     protected function getArguments()
     {
         return array(
-            array('setting', InputArgument::REQUIRED, 'settings name'),
+            array('event_id', InputArgument::REQUIRED, 'Event ID'),
         );
     }
 

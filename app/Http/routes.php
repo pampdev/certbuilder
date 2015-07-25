@@ -17,7 +17,9 @@ Route::get('home', 'HomeController@index');
 
 Route::get('certificates/preview', ['as' => 'certificates.preview', 'uses' => 'CertificatesController@preview']);
 Route::get('certificates/pdf', ['as' => 'certificates.pdf', 'uses' => 'CertificatesController@pdf']);
-Route::get('certificates', 'CertificatesController@index');
+Route::resource('certificates', 'CertificatesController');
+
+Route::get('sketchboard', 'CertificatesController@sketchboard');
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',

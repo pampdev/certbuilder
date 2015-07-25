@@ -1,7 +1,12 @@
 <?php namespace App\Http\Controllers;
 
 use Input;
+use Auth;
+
 use Wkhtmltopdf;
+
+use App\Event;
+use App\Http\Requests\EventFormRequest;
 
 class CertificatesController extends Controller {
 
@@ -14,16 +19,83 @@ class CertificatesController extends Controller {
      */
     public function __construct()
     {
-        
+        $this->middleware('auth');
+        $this->event = new Event();
+
+        $this->themes = [
+            'pdg_attendee' => 'Default - Attendee',
+            'pdg_organizer' => 'Default Organizer'
+        ];
     }
 
     public function index()
     {
-        $this->middleware('auth');
-        $themes = [
-            'default_red' => 'Default - red'
-        ];
-        return view('certificates.index')->with(compact('themes'));
+
+        $list = $this->event->where('user_id', '=', Auth::user()->id)->get();
+
+        return view('certificates.index')->with(compact('list'));
+    }
+
+    public function show($event_id)
+    {
+        $event = $this->event->find($event_id);
+
+        return view('certificates.show')->with(compact('event'));
+    }
+
+    public function create()
+    {
+        $event = null;
+        $themes = $this->themes;
+        $cert_types = $this->event->certTypes();
+        return view('certificates.form')->with(compact('event', 'themes', 'cert_types'));
+    }
+
+    public function store(EventFormRequest $request)
+    {
+        $data = (array)$request->all();
+        $data['user_id'] = Auth::user()->id;
+        $this->event->create($data);
+        if ($this->event) {
+            return redirect('/certificates/' . $this->event->id)->with('message', 'Event added.');    
+        }
+        
+        return redirect('/certificates/create')->withError('Event failed.');
+    }
+
+    public function edit($event_id)
+    {
+        $event = $this->event->find($event_id);
+        $themes = $this->themes;
+        $cert_types = $this->event->certTypes();
+        return view('certificates.form')->with(compact('event', 'themes', 'cert_types'));
+    }
+
+    public function update($id, EventFormRequest $request)
+    {
+        $data = (array)$request->all();
+        $event = $this->event->find($id);
+        $data['code'] = $event->code;
+        $event->update($data);
+        if ($event) {
+            return redirect('/certificates/' . $event->id)->with('message', 'Event added.');    
+        }
+        
+        return redirect('/certificates/create')->withError('Event failed.');
+    }
+
+    public function sketchboard()
+    {
+        
+        $themes = $this->themes;
+        $event_id = Input::get('setting');
+        
+        $event = null;
+        if ($event_id) {
+            $event = $this->event->find($event_id);
+        }
+
+        return view('certificates.sketchboard')->with(compact('themes', 'event'));
     }
 
     public function preview()
@@ -43,16 +115,18 @@ class CertificatesController extends Controller {
 
         // Get default values from the settings
         $setting_filename = Input::get('setting');
-        $path = base_path() . '/resources/certificate_settings/' . $setting_filename . '/';
-        $setup = parse_ini_file($path . 'setup.ini', true);
+        if ($setting_filename) {
+            $path = base_path() . '/CertificateBuilder/events/' . $setting_filename . '/';
+            $setup = parse_ini_file($path . 'setup.ini', true);
 
-        foreach ($setup['event'] as $key => $value) {
-            if (isset($variables[$key])) {
-                ${$key} = trim($value);
+            foreach ($setup['event'] as $key => $value) {
+                if (in_array($key, $variables)) {
+                    ${$key} = trim($value);
+                }
             }
-        }
 
-        $theme = $setup['app']['theme'];
+            $theme = $setup['app']['theme'];
+        }
 
         // Can be changed via _GET
         foreach ($variables as $key) {
@@ -72,7 +146,7 @@ class CertificatesController extends Controller {
             $name_style = 'style="font-size: 4em;"';
         }
 
-        return view('templates.default_red.index')->with(compact(
+        return view('templates.'.$theme.'.index')->with(compact(
             'name', 'name_style', 'title', 'theme',
             'event_name', 'event_place', 'date_day', 'date_month', 'date_year'
         ));
