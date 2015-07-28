@@ -3,3 +3,4 @@
 .env
 public/download
 resources/certificate_settings
+public/tmp

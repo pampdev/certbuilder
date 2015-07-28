@@ -22,7 +22,14 @@ class CertificatesController extends Controller {
         $this->middleware('auth');
         $this->event = new Event();
 
+        // $path = base_path() . '/resources/templates/';
+        // if ($this->files->isDirectory($this->getPath(null)))
+        // {
+        //     return $this->error('Certificate "'.$this->getSetupName().'" is already exists.');
+        // }
+
         $this->themes = [
+            'default' => 'Default',
             'pdg_attendee' => 'Default - Attendee',
             'pdg_organizer' => 'Default Organizer'
         ];
