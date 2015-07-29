@@ -134,20 +134,6 @@ class CertificatesController extends Controller {
         ];
 
         // Get default values from the settings
-        $setting_filename = Input::get('setting');
-        if ($setting_filename) {
-            $path = base_path() . '/CertificateBuilder/events/' . $setting_filename . '/';
-            $setup = parse_ini_file($path . 'setup.ini', true);
-
-            foreach ($setup['event'] as $key => $value) {
-                if (in_array($key, $variables)) {
-                    ${$key} = trim($value);
-                }
-            }
-
-            $theme = $setup['app']['theme'];
-        }
-
         $prefix = 'xx_';
 
         // Can be changed via _GET
@@ -174,13 +160,13 @@ class CertificatesController extends Controller {
         ));
 
         if (Input::get('download')) {
-            $path = base_path() . '/CertificateBuilder/pdf_settings.ini';
-            $pdf_settings = parse_ini_file($path, true);
             $wkoptions_path = base_path() . '/public/tmp/';
 
             if (!file_exists($wkoptions_path)) {
                 mkdir($wkoptions_path, 0777, true);
             }
+
+            $pdf_settings['pdf'] = \Config::get('pdf.settings');
 
             $this->wkoptions = array(
                 'path' => $wkoptions_path,
