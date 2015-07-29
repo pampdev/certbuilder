@@ -51,7 +51,7 @@
 									Login
 								</button>
 
-								<a href="/password/email">Forgot Your Password?</a>
+								<a href="{{ url('/password/email') }}">Forgot Your Password?</a>
 							</div>
 						</div>
 					</form>
