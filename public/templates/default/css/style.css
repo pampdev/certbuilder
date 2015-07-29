@@ -1,0 +1,79 @@
+@CHARSET "UTF-8";
+
+@font-face {
+	font-family: Alegreya-Regular;
+	src: url('../fonts/Alegreya/Alegreya-Regular.ttf');
+}
+
+@font-face {
+    font-family: Alegreya-Bold;
+    src: url('../fonts/Alegreya/Alegreya-Bold.ttf');
+}
+
+@font-face {
+    font-family: Asset;
+    src: url('../fonts/Asset/Asset.ttf');
+}
+
+@font-face {
+    font-family: PinyonScript-Regular;
+    src: url('../fonts/Pinyon_Script/PinyonScript-Regular.ttf');
+}
+
+body {
+	text-align: center;
+	margin: 0;
+	padding: 0;
+	padding-top: 4em;
+	background: url(../images/texture.jpg) repeat center center fixed;
+}
+
+p {
+	font-family: Alegreya-Regular, sans-serif;
+	font-size: 1em;
+}
+
+#border-top, #border-bottom {
+    background: url(../images/border.png) repeat-x left top;
+    height: 61px;
+    margins: 0;
+    padding: 0;
+}
+
+#border-bottom {
+	 -webkit-transform:scaleY(-1);
+	 margin-bottom: 5.25em;
+}
+
+p.signed, p.signature {
+	text-align:right;
+	padding-right: 25%;
+}
+
+p.signature {
+	margin-top: -2em;
+}
+
+#title {
+	font-family: PinyonScript-Regular, sans-serif;
+	font-size: 4em;
+	margin-bottom: -0.25em;
+}
+
+#name {
+	font-family: Alegreya-Bold, sans-serif;
+	font-size: 1.5em;
+}
+
+#certification {
+	font-family: Asset, sans-serif;
+	font-size: 1.5em;
+}
+
+#date_day, #date_month, #date_year {
+	   font-family: Alegreya-Bold, sans-serif;
+}
+
+#location {
+	font-family: Alegreya-Bold, sans-serif;
+}
